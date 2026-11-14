@@ -1,0 +1,137 @@
+What is a managed security service provider ?
+
+A Managed Security Service Provider (MSSP) is similar to a Managed Service Provider (MSP) in Information Technology (IT); however, they specialize in security. An MSP provides a broad range of IT services, while MSSPs offer specialized services to companies that need to scale up security. 
+Typically, MSSPs provide monitoring and management of security devices and systems. Common services offered include things such as firewall management, intrusion detection, vulnerability scanning, and anti-viral services. 
+MSSPs use Security Operation Centers (SOCs) to provide 24/7 support. 
+MSSPs are designed to provide a service that allows their customers to reduce the number of operational security personnel an enterprise needs to hire, train, and retain to maintain an acceptable security posture.
+
+
+What does a SOC Analyst Do?
+
+The role of an analyst is very important to our operations. Our analysts fill a role in providing prompt detection and response through 24-hour analysis coverage. 
+By analyzing incidents, we can pinpoint weak spots in our customer's security posture, which of course means we can work with them to improve it! 
+The continuous monitoring that our analysts support strengthens our customers' resilience against cyber threats.
+
+
+Exploring defense theories in cybersecurity
+
+1. Defense In depth
+First, we have Defense in Depth. This implementation emphasizes the use of multiple layers of controls to provide comprehensive protection. 
+Each layer adds a barrier, so if one layer is breached, there are others in place to prevent further access.
+Network Protection, Endpoint Protection, Application Protection.
+
+2. Zero Trust
+Next, we have Zero Trust. Imagine a grid around each object in an enterprise, be it a user, a server, or a file, for example.
+Access outside an object’s grid square is strictly controlled, authenticated, and subject to continuous monitoring. 
+That's zero trust. This can be simplified as a "deny by default" approach.
+
+3. Active Defense
+Active defense involves engaging in activities to counter threats. This may include deception, traps, or decoy systems, called honeypots or honeynets. 
+These can help to distract an attacker while the blue team gathers information about their tactics.
+
+4. Resilience Theory
+Last, we have the Resilience Theory. This focuses on an organization's response to an attack. 
+It emphasizes the need to adapt and recover from security incidents quickly by using continuous monitoring, incident response planning, and rapid performance of recovery operations.
+
+
+1.2
+Tools for Analysts (10 mins)
+A key part of protecting an organization from threats is having the right security controls and investigation tools in place. 
+
+1. SIEM
+The SOC uses Splunk Enterprise Security (ES) as its SIEM to support event analysis, integration of threat intelligence, and detection of threats.
+
+2. AUTOMATION
+The SOC uses Splunk SOAR to automatically run mitigations when suspicious activities are detected. Splunk SOAR is a security orchestration, automation, and response (SOAR) platform.
+It supports playbooks, which are sequences of actions and decision points that can run automatically and that help guide incident response.
+
+3. TRAFFIC ANALYSIS
+in the Wonderland SOC we use Wireshark and tcpdump to analyze network traffic. 
+Both of these tools are open source and allow you to capture and save network traffic, or analyze it using various filters. 
+Tcpdump is a command-line tool built for Unix-like systems, whereas Wireshark provides a GUI interface. Wireshark does offer a command-line-only version called TShark which is similar to tcpdump, and can be used on Windows or Unix-like systems.
+
+4. CYBERSWISS ARMY KNIFE
+In Wonderland, our analysts often use CyberChef from within a web browser to analyze or manipulate data. 
+This tool can carry out various operations such as simple encoding like Base64, more complex encryption like AES, DES, or Blowfish, creating binary and hex dumps, compression and decompression of data, calculation of hashes and checksums, parsing data, and much more.
+
+
+WHAT ARE APPS AND ADD-ONS?
+A wide variety of apps and add-on tools are available to analysts through Splunkbase. 
+Apps are generally used for visualization, analysis, and representation and include a GUI component. Add-ons are typically used for data optimization and the collection process, and don’t include a GUI aspect. They simply get the job done behind the curtain!
+
+WHAT IS SPLUNKBASE?
+Splunkbase is a marketplace where you can download apps and add-ons for Splunk (and apps for SOAR too). You can also make and upload your own apps and add-ons to share them with the community!
+
+
+A few general categories of security event data, and how they can be used in an investigation
+
+1.NETWORK INFORMATION
+Network packets can be incredibly valuable in an investigation. 
+NetFlow and and other Flow logs are examples of tools that capture network metadata, based on a sampling of network packets. In this type of capture, only headers and general identifying information is collected. 
+On the other hand, you can capture actual copies of the 1s and 0s that travel through the network (wire data), and store it in a Packet Capture (PCAP) file format. This type of data can be very large in volume, which means it must be captured and stored with discretion.
+
+2.AUTHENTICATION INFORMATION
+Information about your assets, like servers or other resources, or identity information related to users or roles are essential when investigating security events.
+This category includes events from a system like Active Directory, LDAP, RADIUS, TACACS+, Single Sign-On solutions like Okta or Azure AD, AWS Cloudtrail logs, VPN logs, and authentication specific logs from any other source.
+
+3.PROXY AND GATEWAY INFORMATION
+Web proxies or web gateways sit in the middle of communications between users and websites. They can provide useful information to analysts about which websites have been visited by which users.
+Depending on a web proxy's configuration, it may even be inspecting secure HTTPS connections, allowing analysts to identify potential "hidden" traffic or accidental downloads of malicious files. 
+Similarly, email gateways manage and secure email traffic, and can be a source of information about emails from suspicious or known malicious domains as well as any transferred files or included URLs. 
+
+4.ANTIVIRUS OR ANTIMALWARE LOGS
+Anti-virus and anti-malware logs are extremely important when investigating infections or outbreaks within an organization. 
+The signatures for malicious software may also be helpful when researching more about threats that have been detected in the environment. 
+
+Network Traffic
+data is captured bit by bit, it is called a packet capture, or "pcaps." This is a full copy of the traffic that traveled over a network.
+Packet captures, while helpful, contain a LOT of data! So, some other common means for recording or analyzing network traffic include the following:
+
+1. NetFlow: for per device implementation (read more about the protocol at RFC 3954(opens in a new tab))
+2. VPC Flow Logs: for cloud-based capture in AWS or Google Cloud environments
+3. NSG Flow Logs: a feature of Azure Network Watcher for use in Azure cloud environments
+
+Analyzing network traffic in PCAP format is something that is generally done AFTER an event. So what about real-time monitoring?
+
+If the payload of network traffic is inspected in real-time, it's called Deep Packet Inspection (DPI). This is something that can be done by some security solutions, however given the data volume, real-time Deep Packet Inspection is often not feasible. 
+
+Intrusion Detection Systems and Intrusion Prevention Systems (IDS/IPS)
+Intrusion Detection Systems and Intrusion Prevention Systems are types of devices that monitor network traffic for known suspicious activity based on signatures. 
+Whether detecting and alerting to an event, or detecting and blocking activity, these systems can be instrumental when attempting to stitch together various parts of a given attack. Many systems can provide both IDS and IPS capabilities, based on their implementation.
+
+A few examples of network-based systems include Snort, Suricata, Cisco Firepower Next-Generation IPS, and Palo Alto Networks.
+A few examples of host-based systems include McAfee, OSSEC, and Tripwire.
+
+REREAD IP RANGES AND CLASSIFICATIONS AND ports
+
+Firewalls
+Firewalls protect the boundaries between protected and less secure networks. Their logs can give you an idea of which assets communicated, or attempted to communicate within an environment.
+
+Compromised systems may start sending out traffic that doesn’t look like the rest of your traffic. 
+This could be benign. Or...it could be an attacker trying to exfiltrate data, or Command and Control (C2) communication, or an attacker attempting to gain access to a protected zone. 
+
+You might use firewall data to search for a number of indicators or activities, such as:
+
+Unusual allowed traffic or connections between protected zones
+
+Unusual Protocol activity
+
+Excessive denies from a single source or towards a network or host
+
+Evidence of port scanning, and subsequent opening of communications on available ports
+
+
+Endpoint Information
+Endpoints generally include desktops, laptops, mobile devices, wearables, and various other technologies that act as a consumer interface. 
+Endpoint data can provide detailed insight into adversary tactics and techniques due to the fidelity of the logging.
+
+Data from endpoints may be useful for investigating many types of security incidents, such as the following:
+
+Unauthorized access: Failed logins, privilege escalation attempts, and unusual access to files or systems may be detected through endpoint logs.
+Insider threats or unauthorized activity: Examining endpoint logs may help analysts detect behaviors that violate policy or pose a risk, whether they are intentional such as an insider threat, or just a careless user.
+
+Server and Application Logs
+logs from your most important assets, servers, applications, and the like. These native logs offer a place where you can search for odd behaviors like communication, process creation, privilege escalation, account activity, and more.
+
+
+
