@@ -1,0 +1,225 @@
+Working with Data in Splunk
+
+When looking at data from different sources within Splunk, you can identify the source based on some default fields:
+
+1
+The host is the name of the physical or virtual device where an event originates from. For example: a Linux or Windows endpoint, or a firewall, proxy, etc.
+
+2
+The source is the name of the file, directory, data stream, or other input from which a particular event originates. For example, for data monitored from files and directories, the source consists of the full pathname of the file or directory.
+
+3
+Sources are classified into sourcetypes, which can be well-known formats or formats defined by a Splunk Admin.
+
+
+
+The "sourcetype" is a default field that identifies the data structure of an event. It determines how the Splunk platform formats the data during the indexing process and how it will be displayed back to you during searches. 
+
+
+If you are going to start exploring a new environment, a great place to start is to take a look at the different types of hosts and sources that we are receiving data from. Let's review some commands that can help you with that. 
+
+
+Browsing indexes
+Let's begin with getting oriented to the data we have. Our data is contained within indexes. 
+
+In Splunk, an index is a repository for data. When the Splunk platform indexes raw data, it transforms the data into searchable events. The indexes themselves reside in flat files on the indexer.
+For example, we can search for all indexes (*), count them, and display them in a table with the index name as the visible field. This way we can see all the indexes with searchable events and narrow our search to a specific index when needed. 
+
+index=* | stats count by index | fields index
+
+
+Browsing hosts
+The metadata command returns a list of sources, sourcetypes, or hosts from a specified index or distributed search peer. 
+
+In the example below, the index is specified as a wildcard (*), so that we can view a full list of hosts, regardless of where the indexed data resides.
+With the following commands, we specify the type (hosts), and a wildcard to search all available indexes. 
+
+| metadata type=hosts  index=*
+
+
+Browsing sourcetypes
+Let's run the metadata command while filtering for sourcetypes:
+| metadata type=sourcetypes  index=*
+
+
+Browsing sources
+And sources, we can't forget about those! Check out the sources available for Frothly Brewery.
+| metadata type=sources  index=*
+
+
+Splunk supports built-in or pre-trained source types that it uses to parse incoming data into events. You can see a few of these in Frothly's on-premise environment. 
+You can read about them in Splunk Documentation(opens in a new tab).
+
+Some Splunk add-ons have preconfigured inputs that set the appropriate source type for the third-party technology. The add-on separates the data into specific source types if there is more than one source type included with it.
+
+
+While analysts quickly become familiar with various types of logs, no one can be an expert on ALL of them. 
+This is why normalization of data is important, it means that all the data received should follow a common classification scheme
+so that Analysts like us can work with all types of data without having to know the exact structure and syntax of every single source we investigate.
+
+The Splunk Common Information Model helps address this problem by providing a standard to map fields from various data sources. 
+
+
+Data Models
+
+Data models are a group of standard field names and values that can make working with multiple data sources so much easier. 
+If you think about the "junk drawer" example from before, a data model is the equivalent of labeling all the boxes in your drawer and strictly following that label for the contents of all the boxes in the drawer. 
+This means the next time you are looking for scissors, a stapler, or tape, you know exactly which box in the drawer to search. 
+
+the Common Information Model (or CIM) is basically a collection of data models that Splunk defined for specific types of data that are most relevant to security, and generally found in an enterprise environment.
+
+
+
+
+Data Models for Analysis
+
+Authentication, Data Access, Databases, Data Loss Prevention, Email, Endpoint, Intrusion Detection, Malware, Network Traffic, Vulnerabilities, and Web are data models commonly used in security investigations, 
+but ultimately the information you have and what you are investigating will dictate the data models that can add value to your efforts.
+
+
+
+Authentication Data Model
+This data model helps with the correlation of authentication-related data from various sources, grouping data such as successful versus failed authentications, use of default credentials, or logons from privileged users, to name a few.
+
+Email Data model
+This data model helps with analyzing and investigating email-related logs for various sources. It can help identify information like the source or destination of emails, file hashes for email attachments, subject lines, or other information about the email message or contents.
+
+Endpoint Data Model
+This data model provides insights about activities on the endpoint, such as file access, process execution, network connections, and other system changes.
+
+Malware Data model
+related to malware events including indicators like malware signatures, file hashes, and actions taken through the data reporting system such as an anti-virus blocking a connection or deleting a file.
+
+Dataloss Prevention Model
+This data model describes events gathered from DLP tools used to identify, monitor and protect data. This may include information such as data transfers, unauthorized file access, or the transfer of sensitive data across the network.
+
+Network Traffic Model
+This data model describes flows of data across network infrastructure components. Analysts may use it to interpret logs related to network traffic and identify information like IP addresses, ports, TCP flags, and traffic volumes to name a few.
+
+
+
+Splunk Search Processing Language (SPL)
+Splunk Search Processing Language (or SPL) encompasses search commands and the functions, arguments, and clauses used to tell Splunk what to do with the events retrieved from the storage indexes. 
+
+Using SPL is fundamental to investigating events in Splunk as it can be used to search, filter, modify, manipulate, insert, and delete information, all at once. 
+The better we get at using these SPL searches, the faster and more effective we can become as Analysts.
+
+Below are some SPL commands that can help you with narrowing down your search. Click on each item to read how they may be used in an investigation.
+
+The "transaction" command is handy when you need to group related events together, based on a common field, or even a set of fields. 
+
+Let's think about the situation with the user BruceGist and potential data exfiltration. You want to analyze the sessions for this user interacting with a cloud storage service. 
+
+You can see that we are filtering the search for the user and domain (dh) from our scenario with Bruce. 
+The transaction command indicates that the fields of interest are the user, and the amount of data, in bytes, that was sent (bytes_out) based on the filtered events. 
+The results of the transaction command are also sorted by size (bytes_out) and displayed in a table as shown in the image.
+More information about the transaction command is available in Documentation(opens in a new tab).
+
+The "top" and "rare" SPL commands in Splunk identify the most, or least frequent values. For example, you could use the top or rare commands to identify the most and the least common domains that are being queried within an environment. 
+
+The "first" and "last" SPL commands are useful for analysts investigating an activity's first or last incidence. For example, the "first" command could pinpoint the first event in the original list of values returned. These commands provide chronological and timestamp order distinction of events.
+
+You can use the rex command to either extract fields using regular expression named groups or replace or substitute characters in a field using sed expressions. Think about how useful this may be to an analyst!
+
+ | rex field=_raw "From: <(?<from>.*)> To: <(?<to>.*)>"
+
+
+
+Level-up your SPL!
+
+The Lookup command
+The lookup command allows you to add data to Splunk, like a CSV file of known indicators, and then use that data to enhance your Splunk searches. Lookups can be imported CSV files, but they can also be automatic, scripted, pull data from databases, or leverage Splunk’s KV store. 
+
+1. Create a CSV
+2. Create a lookup table file from a csv
+3. Create a lookup definition
+4. Use your file in search
+
+
+The required syntax is in bold.
+
+lookup[local=<bool>][update=<bool>]<lookup-table-name>( <lookup-field> [AS <event-field>] )...[ OUTPUT | OUTPUTNEW (<lookup-destfield> [AS <event-destfield>] )... ] 
+You can learn more about syntax for this, and other commands, in the Splunk Documentation(opens in a new tab).
+
+Malicious activity over DNS may be indicative of things like an increase in the volume of requests by the client, 
+a change in the type of resource records you see, variance in the length of the request, indicating encoding or obfuscation, variability in the frequency of requests, randomness in domain names, or substitution of domains to very slightly altered domains, as in typosquatting.
+
+Eval is huge! The eval command can help you analyze and calculate results for mathematical, string, and boolean expressions.
+
+the results of your calculation using eval are then written to a search results field. You can specify that field.  Results that are numbers and strings are going to be automatically assigned; if you have a boolean, you have to make sure that you convert it to a string using the function tostring(). 
+
+In this example SPL, eval is used with the if() function to set the value in an "error" field to 'OK' if the status value is 200. Otherwise, the "error" field is set to 'Problem. '
+
+index=main sourcetype=access_combined
+| eval error = if(status == 200, "OK", "Problem")
+
+Syntax for the eval command:
+
+eval <field>=<expression>["," <field>=<expression>]... 
+You can learn more about syntax for this, and other commands, in the Splunk Documentation(opens in a new tab).
+
+
+Searching Data models
+
+A common term you'll hear when working with Data Models is datasets. Datasets are collections of data with specific constraints and fields, making up each Data Model. 
+While it may take practice and patience, it's important to become familiar with the structure of some of these datasets because you'll need to identify them if you want to use a Data Model in a search, or if you want to understand what an existing search is being used for. 
+
+Accelerating a Data Model tells Splunk to keep a separate set of index files with all the accelerated datasets in it. By saving key values in a summary index, searches speed up because Splunk can then use the values from these index files, rather than having to retrieve the raw events for the search.
+
+Data Model searches can become quite complex, so these are used more often by our Engineers or Architects when they build or modify dashboards, reports, or correlation searches for example.
+
+| datamodel [<data model name>] [<data model search mode>] [summariesonly=<bool>]
+
+
+The name of the data model to search. When only the data model is specified, the search returns the JSON for the single data model. This is helpful when you don't have easy access to the documentation to review the available datasets or fields. 
+For example see the result of the following SPL below:
+| datamodel authentication
+
+
+You can use data model searches to return either results or a search string. If you want to do this, you must provide a <data model search mode>. 
+You can use the "search" mode to return search results exactly how they are defined. 
+Alternatively, you can use the "flat" mode to strip hierarchical information from the field names.
+
+
+Summaries only
+You can use data model searches to return either results or a search string. If you want to do this, you must provide a <data model search mode>. 
+You can use the "search" mode to return search results exactly how they are defined. 
+Alternatively, you can use the "flat" mode to strip hierarchical information from the field names.
+
+Using Statistical Queries
+Another command available for you to use on accelerated data models is tstats. The tstats command is used to perform statistical queries on indexed fields in a time-series index (tsidx) file. 
+
+Together, the raw data file and its related tsidx file make up the contents of an index.
+Because tstats searches on index-time fields instead of raw events, it ends up being faster than the stats command.
+
+The tstats command calculates statistics based on fields in your events. The eval command creates new fields in your events by using existing fields and an arbitrary expression.
+The stats command calculates aggregate statistics, such as average, count, and sum, over the incoming search results set. But how is it different from tstats?
+Well, a key difference in what the command searches through. The tstats command only looks at the indexed metadata, whereas stats is working off the data (in this case the raw events) before that command.
+
+The SPL search below uses tsats to show information about any processes started on endpoints. It is also organizing it based on the time the event appeared. 
+
+This search uses summary information from the Endpoint Data Model in Splunk. You can see how the "Processes" dataset is being identified here to compose this search. 
+
+| tstats summariesonly=true count from datamodel=Endpoint.Processes where Processes.user="*" Processes.process=* Processes.parent_process=* Processes.user="*" groupby _time span=1s Processes.process Processes.parent_process Processes.user |`drop_dm_object_name("Processes")`
+| table _time process parent_process user count
+| sort + _time
+
+Better Searching Do this!
+
+Restricting time ranges whenever possible.
+
+•
+Using appropriate index and sourcetype filters.
+
+•
+Using filters and sub-searches to narrow results and drill down to more granular details.
+
+
+In this section you explored all about data, and how to use it within Splunk, the Wonderland SOC's SIEM solution. Now that you completed your time with Ashley you:
+
+Can identify sources of data in Splunk based on the default fields host, source,    sourcetype.
+Know that the Splunk Common Information Model (CIM) is used to normalize data and provide a map to help you organize and analyze the information that exists within many, differently formatted logs.
+Understand Data Models in the context of Splunk and why SOC analysts and engineers can use them to improve their searches when configuring alerts or investigating security incidents. 
+Had a glimpse at why Splunk's Search Processing Language (SPL) is a powerful tool for analyzing data.
+Understand that SOC analysts should be familiar with basic SPL commands, and seek resources as needed to run more efficient searches.
+Can explain the use of common SPL commands like: transaction, first and last, top and rare, rex, eval, lookup and tstats. 
